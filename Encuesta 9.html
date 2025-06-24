@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta Ciudad Juan Bosch: ¡Tu Voz Cuenta!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #5cb85c;
+            --secondary-color: #00509e;
+            --background-color: #f4f7f6;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 8px 25px rgba(0,0,0,.08);
+            --error-color: #00509e; /* Color de error actualizado a azul */
+            --error-bg-color: #e6f7ff; /* Fondo de error actualizado */
+        }
+
+        body {
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px 10px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+        .survey-container {
+            max-width: 850px;
+            margin: 20px auto;
+            padding: 30px 40px;
+            background-color: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: var(--box-shadow);
+            border: 1px solid #e0e0e0;
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem);
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 1.9rem);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 15px;
+            margin-top: 40px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        h3 {
+             font-size: clamp(1.3rem, 3.5vw, 1.6rem);
+             margin-top: 35px;
+             margin-bottom: 25px;
+             text-align: left;
+        }
+
+        .question-block {
+            margin-bottom: 35px;
+            padding: 25px;
+            border: 1px solid #e0e4e8;
+            border-left: 5px solid var(--primary-color);
+            background-color: #f9fcff;
+            border-radius: var(--border-radius);
+            transition: box-shadow 0.3s ease;
+        }
+        .question-block:hover {
+            box-shadow: 0 4px 15px rgba(0, 80, 158, 0.08);
+        }
+
+        .main-question-label {
+            display: block;
+            margin-bottom: 18px;
+            font-weight: 600;
+            color: #000000;
+            font-size: 1.15em;
+        }
+
+        input[type=text], input[type=number], select, textarea {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1em;
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            transition: border-color .3s ease, box-shadow .3s ease;
+        }
+        input[type=text]:focus, input[type=number]:focus, select:focus, textarea:focus {
+            border-color: var(--secondary-color);
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(0, 80, 158, .2);
+        }
+
+        .options-group div, .checkbox-group div {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center; /* Alinear verticalmente */
+        }
+        .options-group input[type=radio], .options-group input[type=checkbox], .checkbox-group input[type=checkbox] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .options-group label, .checkbox-group label {
+            font-weight: 500;
+            font-size: 1em;
+            color: #555;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+        .checkbox-group input[type=checkbox]:disabled + label {
+            color: #aaa;
+            cursor: not-allowed;
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+        .button-container button {
+            padding: 14px 30px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            font-weight: 600;
+            margin: 5px 10px;
+            transition: background-color .3s ease, transform .2s ease, box-shadow .3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .button-container button:hover {
+            background-color: #4cae4c;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .button-container button.secondary {
+            background-color: var(--secondary-color);
+        }
+        .button-container button.secondary:hover {
+            background-color: #003d7a;
+        }
+        .button-container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .hidden-by-logic, .survey-page, .permanently-hidden {
+             display: none;
+        }
+        .active-page { display: block; }
+
+        .notes {
+            font-size: .95em;
+            color: #333;
+            margin-bottom: 25px;
+            padding: 15px 20px;
+            background-color: #e6f7ff;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+        }
+        
+        /* Estilos de error actualizados */
+        #validation-message {
+            display: none; 
+            padding: 12px; 
+            margin-bottom: 20px; 
+            background-color: var(--error-bg-color); 
+            color: var(--error-color); 
+            border: 1px solid var(--error-color); 
+            border-radius: var(--border-radius); 
+            text-align: center;
+            font-weight: 500;
+        }
+        input.error, select.error, textarea.error {
+            border: 2px solid var(--error-color) !important;
+            background-color: var(--error-bg-color);
+        }
+        .main-question-label.error {
+            color: var(--error-color);
+        }
+
+        /* Estilos para Drag and Drop */
+        .prioritization-instructions { margin-bottom: 20px; font-size: 1em; color: #333; }
+        #sortable-sections { list-style-type: none; padding: 0; user-select: none; }
+        #sortable-sections li {
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        #sortable-sections li:hover { background-color: #ddeeff; }
+        #sortable-sections li.sortable-chosen { cursor: grabbing; background-color: #dde2e6; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        #sortable-sections li .order-number { margin-right: 15px; font-weight: bold; color: var(--secondary-color); min-width: 25px; text-align: right; }
+        .sortable-ghost { opacity: 0.5; background: #c8ebfb; border: 2px dashed #007bff; }
+
+        /* Estilos para el Modal de Confirmación */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background-color: #fff; padding: 30px; border-radius: 8px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-width: 400px; width: 90%; }
+        .modal-content p { margin-bottom: 20px; font-size: 1.05em; line-height: 1.5; }
+        .modal-content button { padding: 10px 20px; margin: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-weight: 500; font-size: 1em; }
+        #confirmAdvance { background-color: #5cb85c; color: white; }
+        #cancelAdvance { background-color: #aaa; color: #333; }
+        
+        /* Estilos para Escala Likert */
+        .likert-scale-container {
+            width: 100%;
+            overflow-x: auto; /* Para móviles */
+        }
+        .likert-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px; /* Ancho mínimo para mantener el formato */
+        }
+        .likert-table th, .likert-table td {
+            padding: 12px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .likert-table th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        .likert-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+            width: 40%;
+        }
+        .likert-table input[type="radio"] {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <h1>Encuesta Ciudad Juan Bosch: ¡Tu Voz Cuenta!</h1>
+        <form id="ciudadJuanBoschSurvey" novalidate>
+             <!-- Mensaje de validación global -->
+            <div id="validation-message"></div>
+
+            <!-- Página 1: Información Personal -->
+            <div class="survey-page active-page" id="page1">
+                <h2>Conociéndonos Mejor (Información Personal)</h2>
+                <p class="notes">¡Hola! Queremos saber qué piensas para ayudar a mejorar nuestra comunidad, Ciudad Juan Bosch. Este primer módulo es para conocerte un poco. Tus respuestas son secretas y no se compartirán con tu nombre.</p>
+                <div class="question-block">
+                    <label class="main-question-label" for="q1_tiempo_viviendo">P1. ¿Cuánto tiempo tienes viviendo en Ciudad Juan Bosch?</label>
+                    <div class="options-group">
+                        <div><input type="radio" id="q1_op1" name="tiempo_viviendo" value="menos_1_ano" required> <label for="q1_op1">Menos de 1 año</label></div>
+                        <div><input type="radio" id="q1_op2" name="tiempo_viviendo" value="1_3_anos"> <label for="q1_op2">Entre 1 y 3 años</label></div>
+                        <div><input type="radio" id="q1_op3" name="tiempo_viviendo" value="4_5_anos"> <label for="q1_op3">Entre 4 y 5 años</label></div>
+                        <div><input type="radio" id="q1_op4" name="tiempo_viviendo" value="mas_5_anos"> <label for="q1_op4">Más de 5 años</label></div>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <label class="main-question-label" for="q2_edad">P2. ¿Qué edad tienes?</label>
+                    <div class="options-group">
+                        <div><input type="radio" id="q2_op1" name="edad" value="18_30" required> <label for="q2_op1">18-30 años</label></div>
+                        <div><input type="radio" id="q2_op2" name="edad" value="31_45"> <label for="q2_op2">31-45 años</label></div>
+                        <div><input type="radio" id="q2_op3" name="edad" value="46_59"> <label for="q2_op3">46-59 años</label></div>
+                        <div><input type="radio" id="q2_op4" name="edad" value="60_mas"> <label for="q2_op4">60 años o más</label></div>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <label class="main-question-label" for="q3_tiene_hijos">P3. ¿Tiene usted hijos o menores que vivan con usted?</label>
+                    <div class="options-group">
+                        <div><input type="radio" id="q3_op1" name="tiene_hijos" value="si" required> <label for="q3_op1">Sí</label></div>
+                        <div><input type="radio" id="q3_op2" name="tiene_hijos" value="no"> <label for="q3_op2">No</label></div>
+                    </div>
+                </div>
+                <div class="question-block hidden-by-logic" id="bloque_q4">
+                    <label class="main-question-label" for="q4_cuantos_hijos">P4. (Si P3=Sí) ¿Cuántos hijos o menores viven con usted?</label>
+                    <div class="options-group">
+                        <div><input type="radio" id="q4_op1" name="cuantos_hijos" value="1" required> <label for="q4_op1">1</label></div>
+                        <div><input type="radio" id="q4_op2" name="cuantos_hijos" value="2_3"> <label for="q4_op2">2 a 3</label></div>
+                        <div><input type="radio" id="q4_op3" name="cuantos_hijos" value="mas_3"> <label for="q4_op3">Más de 3</label></div>
+                    </div>
+                </div>
+                <div class="question-block hidden-by-logic" id="bloque_q5">
+                    <label class="main-question-label">P5. (Si P3=Sí) ¿Qué edad tienen los menores que viven con usted? (Marque todas las que apliquen)</label>
+                    <div class="checkbox-group" data-max-select="4">
+                        <div><input type="checkbox" id="q5_op1" name="edad_menores" value="0_5"> <label for="q5_op1">0-5 años</label></div>
+                        <div><input type="checkbox" id="q5_op2" name="edad_menores" value="6_12"> <label for="q5_op2">6-12 años</label></div>
+                        <div><input type="checkbox" id="q5_op3" name="edad_menores" value="13_17"> <label for="q5_op3">13-17 años</label></div>
+                        <div><input type="checkbox" id="q5_op4" name="edad_menores" value="18_30"> <label for="q5_op4">18-30 años</label></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- Página de Priorización -->
+            <div class="survey-page" id="page_prioritization">
+                <h2>Prioriza las Siguientes Secciones</h2>
+                <p class="notes">A continuación, verás una lista de secciones. Por favor, organízalas arrastrándolas y soltándolas en el orden de importancia que consideras que tienen para mejorar Ciudad Juan Bosch. Coloca la más importante arriba (posición 1).</p>
+                <div class="prioritization-instructions">
+                    <strong>Instrucciones:</strong> Haz clic y mantén presionado sobre una sección para arrastrarla a la posición deseada.
+                </div>
+                <ul id="sortable-sections">
+                    <li data-section-id="page_servicios_basicos"><span class="order-number">1.</span>Servicios Básicos</li>
+                    <li data-section-id="page_seguridad_ciudadana"><span class="order-number">2.</span>Seguridad Ciudadana</li>
+                    <li data-section-id="page_calles_aceras_transporte"><span class="order-number">3.</span>Calles, Aceras y Transporte</li>
+                    <li data-section-id="page_salud"><span class="order-number">4.</span>Salud</li>
+                    <li data-section-id="page_educacion"><span class="order-number">5.</span>Educación</li>
+                    <li data-section-id="page_medio_ambiente"><span class="order-number">6.</span>Medio Ambiente</li>
+                    <li data-section-id="page_deportes"><span class="order-number">7.</span>Deportes y Recreación</li>
+                    <li data-section-id="page_cultura_arte"><span class="order-number">8.</span>Cultura y Arte</li>
+                    <li data-section-id="page_participacion_ciudadana"><span class="order-number">9.</span>Participación Ciudadana</li>
+                </ul>
+                <input type="hidden" id="prioritized_order" name="prioritized_sections_order">
+                <div class="button-container">
+                    <button type="button" class="nav-button prev-page secondary">Anterior</button>
+                    <button type="button" class="nav-button next-page">Siguiente</button>
+                </div>
+            </div>
+
+            <!-- ========= INICIO DE SECCIONES DE PREGUNTAS ========= -->
+            
+            <!-- A. Servicios Básicos -->
+            <div class="survey-page" id="page_servicios_basicos">
+                <h2>A. Servicios Básicos</h2>
+                <div class="question-block">
+                    <label class="main-question-label">Del 1 al 5, ¿cómo califica los siguientes servicios en Ciudad Juan Bosch?</label>
+                    <div class="likert-scale-container">
+                        <table class="likert-table">
+                            <thead>
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>1 (Muy Malo)</th>
+                                    <th>2 (Malo)</th>
+                                    <th>3 (Regular)</th>
+                                    <th>4 (Bueno)</th>
+                                    <th>5 (Muy Bueno)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Agua Residencial</td>
+                                    <td><input type="radio" name="calif_agua" value="1" required></td>
+                                    <td><input type="radio" name="calif_agua" value="2"></td>
+                                    <td><input type="radio" name="calif_agua" value="3"></td>
+                                    <td><input type="radio" name="calif_agua" value="4"></td>
+                                    <td><input type="radio" name="calif_agua" value="5"></td>
+                                </tr>
+                                <tr>
+                                    <td>Energía Eléctrica</td>
+                                    <td><input type="radio" name="calif_luz" value="1" required></td>
+                                    <td><input type="radio" name="calif_luz" value="2"></td>
+                                    <td><input type="radio" name="calif_luz" value="3"></td>
+                                    <td><input type="radio" name="calif_luz" value="4"></td>
+                                    <td><input type="radio" name="calif_luz" value="5"></td>
+                                </tr>
+                                <tr>
+                                    <td>Recogida de Basura</td>
+                                    <td><input type="radio" name="calif_basura" value="1" required></td>
+                                    <td><input type="radio" name="calif_basura" value="2"></td>
+                                    <td><input type="radio" name="calif_basura" value="3"></td>
+                                    <td><input type="radio" name="calif_basura" value="4"></td>
+                                    <td><input type="radio" name="calif_basura" value="5"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <label class="main-question-label">Además de los anteriores, ¿qué otra necesidad urgente tiene sobre servicios básicos? (Seleccione hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="sb_p1_op3" name="servicios_basicos_necesidad_principal" value="problemas_voltaje"> <label for="sb_p1_op3">Solución a problemas con el voltaje eléctrico.</label></div>
+                        <div><input type="checkbox" id="sb_p1_op5" name="servicios_basicos_necesidad_principal" value="problemas_internet"> <label for="sb_p1_op5">Mejorar la conexión a internet residencial (velocidad y estabilidad).</label></div>
+                        <div><input type="checkbox" id="sb_p1_op6" name="servicios_basicos_necesidad_principal" value="mala_calidad_telefonia"> <label for="sb_p1_op6">Mejora en la calidad de la señal de telefonía móvil.</label></div>
+                        <div><input type="checkbox" id="sb_p1_op10_otros" name="servicios_basicos_necesidad_principal" value="otros"> <label for="sb_p1_op10_otros">Otra necesidad (especifique):</label><input type="text" id="sb_p1_otros_especifique_servicios" name="servicios_basicos_necesidad_principal_otros_texto" class="hidden-by-logic" style="margin-left:10px;width:auto;flex-grow:1" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+            
+            <!-- B. Seguridad Ciudadana -->
+            <div class="survey-page" id="page_seguridad_ciudadana">
+                <h2>B. Seguridad Ciudadana</h2>
+                <div class="question-block">
+                    <label class="main-question-label" for="seguridad_calidad_general">En una escala del 1 al 5, ¿cómo calificaría la seguridad en general en Ciudad Juan Bosch?</label>
+                    <select id="seguridad_calidad_general" name="seguridad_calidad_general" required>
+                        <option value="" disabled selected>Seleccione una opción...</option>
+                        <option value="1">1 - Muy Mala</option>
+                        <option value="2">2 - Mala</option>
+                        <option value="3">3 - Regular</option>
+                        <option value="4">4 - Buena</option>
+                        <option value="5">5 - Muy Buena</option>
+                    </select>
+                </div>
+                <div class="question-block">
+                    <label class="main-question-label">¿Qué acciones considera más urgentes para mejorar la seguridad en CJB? (Marque hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="sc_p2_op1" name="seguridad_acciones" value="aumentar_presencia_policial"> <label for="sc_p2_op1">Aumentar la presencia policial y el patrullaje.</label></div>
+                        <div><input type="checkbox" id="sc_p2_op2" name="seguridad_acciones" value="mejorar_iluminacion_calles_parques"> <label for="sc_p2_op2">Mejorar la iluminación en calles y áreas comunes.</label></div>
+                        <div><input type="checkbox" id="sc_p2_op3" name="seguridad_acciones" value="instalar_mas_camaras_vigilancia"> <label for="sc_p2_op3">Instalar más cámaras de vigilancia (CCTV).</label></div>
+                        <div><input type="checkbox" id="sc_p2_op6" name="seguridad_acciones" value="controles_estrictos_ruido_desorden"> <label for="sc_p2_op6">Establecer controles más estrictos sobre el ruido y el desorden público.</label></div>
+                        <div><input type="checkbox" id="sc_p2_op7" name="seguridad_acciones" value="mejorar_coordinacion_policia_residentes"> <label for="sc_p2_op7">Mejorar la coordinación entre la policía y los residentes.</label></div>
+                         <div><input type="checkbox" id="sc_p2_op11_otros" name="seguridad_acciones" value="otros"> <label for="sc_p2_op11_otros">Otra acción urgente (especifique):</label><input type="text" id="sc_p2_acciones_otros_texto" name="seguridad_acciones_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- C. Calles, Aceras y Transporte -->
+            <div class="survey-page" id="page_calles_aceras_transporte">
+                <h2>C. Calles, Aceras y Transporte</h2>
+                <p class="notes">Esta sección se ha dividido en dos partes para entender mejor sus necesidades.</p>
+                
+                <h3>C.1. Movilidad Peatonal y Vial</h3>
+                <div class="question-block">
+                    <label class="main-question-label">Pensando en cómo nos movemos a pie o en vehículos, ¿cuál es su principal necesidad? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="cat_mov_op1" name="movilidad_problema" value="mejora_estado_calles"> <label for="cat_mov_op1">Mejorar el estado de las calles (reparar baches).</label></div>
+                        <div><input type="checkbox" id="cat_mov_op2" name="movilidad_problema" value="aceras_buen_estado_anchas"> <label for="cat_mov_op2">Tener aceras en buen estado y más anchas.</label></div>
+                        <div><input type="checkbox" id="cat_mov_op3" name="movilidad_problema" value="mas_rampas_accesibilidad"> <label for="cat_mov_op3">Más rampas y mejor accesibilidad para personas con movilidad reducida.</label></div>
+                        <div><input type="checkbox" id="cat_mov_op7" name="movilidad_problema" value="senalizacion_vial_clara"> <label for="cat_mov_op7">Mejorar la señalización vial (señales de pare, ceda el paso, etc.).</label></div>
+                        <div><input type="checkbox" id="cat_mov_op9" name="movilidad_problema" value="mejor_iluminacion_calles_aceras"> <label for="cat_mov_op9">Mejor iluminación en calles y aceras.</label></div>
+                        <div><input type="checkbox" id="cat_mov_op11_otros" name="movilidad_problema" value="otros"> <label for="cat_mov_op11_otros">Otro problema urgente (especifique):</label><input type="text" id="cat_mov_op11_otros_texto" name="movilidad_problema_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+
+                <h3>C.2. Transporte Público y Vehicular</h3>
+                 <div class="question-block">
+                    <label class="main-question-label">Sobre el transporte público y el uso de vehículos, ¿cuál es su principal necesidad? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="cat_trans_op4" name="transporte_problema" value="transporte_publico_eficiente"> <label for="cat_trans_op4">Un transporte público eficiente (más rutas, frecuencia y seguridad).</label></div>
+                        <div><input type="checkbox" id="cat_trans_op5" name="transporte_problema" value="sentirse_seguro_transporte_paradas"> <label for="cat_trans_op5">Sentirme más seguro/a en el transporte público y en las paradas.</label></div>
+                        <div><input type="checkbox" id="cat_trans_op8" name="transporte_problema" value="facil_encontrar_estacionamiento"> <label for="cat_trans_op8">Que sea más fácil encontrar estacionamiento.</label></div>
+                        <div><input type="checkbox" id="cat_trans_op10" name="transporte_problema" value="conductores_prudentes_normas"> <label for="cat_trans_op10">Que los conductores sean más prudentes y respeten las normas.</label></div>
+                        <div><input type="checkbox" id="cat_trans_op11_otros" name="transporte_problema" value="otros"> <label for="cat_trans_op11_otros">Otro problema urgente (especifique):</label><input type="text" id="cat_p1_problema_principal_otros_texto" name="transporte_problema_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- D. Salud -->
+            <div class="survey-page" id="page_salud">
+                <h2>D. Salud</h2>
+                 <div class="question-block">
+                    <label class="main-question-label" for="salud_calidad_general">En una escala del 1 al 5, ¿cómo calificaría la calidad general de los servicios de salud a los que ha accedido en CJB?</label>
+                    <select id="salud_calidad_general" name="salud_calidad_general" required>
+                        <option value="" disabled selected>Seleccione una opción...</option>
+                        <option value="1">1 - Muy Mala</option>
+                        <option value="2">2 - Mala</option>
+                        <option value="3">3 - Regular</option>
+                        <option value="4">4 - Buena</option>
+                        <option value="5">5 - Muy Buena</option>
+                    </select>
+                </div>
+                <div class="question-block">
+                    <label class="main-question-label">¿Qué mejoras específicas en los servicios de salud considera más necesarias? (Marque hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="sal_p3_op1" name="salud_mejoras" value="mayor_disponibilidad_medicos"> <label for="sal_p3_op1">Mayor disponibilidad de médicos especialistas.</label></div>
+                        <div><input type="checkbox" id="sal_p3_op3" name="salud_mejoras" value="reduccion_tiempos_espera"> <label for="sal_p3_op3">Reducir los tiempos de espera para citas y en emergencias.</label></div>
+                        <div><input type="checkbox" id="sal_p1_op4" name="salud_mejoras" value="acceso_salud_mental"> <label for="sal_p1_op4">Mejorar el acceso a servicios de salud mental.</label></div>
+                        <div><input type="checkbox" id="sal_p_new_1" name="salud_mejoras" value="programas_salud_preventiva"> <label for="sal_p_new_1">Implementación de programas de salud preventiva y promoción de hábitos saludables en las escuelas.</label></div>
+                        <div><input type="checkbox" id="sal_p_new_2" name="salud_mejoras" value="farmacias_medicamentos_asequibles"> <label for="sal_p_new_2">Farmacias con programas de medicamentos asequibles para enfermedades crónicas.</label></div>
+                        <div><input type="checkbox" id="sal_p3_op9_otros" name="salud_mejoras" value="otros"> <label for="sal_p3_op9_otros">Otra mejora (especifique):</label><input type="text" id="sal_p3_mejoras_especificas_otros_texto" name="salud_mejoras_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- E. Educación -->
+            <div class="survey-page" id="page_educacion">
+                <h2>E. Educación</h2>
+                 <div class="question-block">
+                    <label class="main-question-label" for="edu_calidad_general">En una escala del 1 al 5, ¿cómo calificaría la calidad general de la educación en CJB?</label>
+                    <select id="edu_calidad_general" name="edu_calidad_general" required>
+                        <option value="" disabled selected>Seleccione una opción...</option>
+                        <option value="1">1 - Muy Mala</option>
+                        <option value="2">2 - Mala</option>
+                        <option value="3">3 - Regular</option>
+                        <option value="4">4 - Buena</option>
+                        <option value="5">5 - Muy Buena</option>
+                    </select>
+                </div>
+                
+                <h3>Educación Básica y Media</h3>
+                <div class="question-block">
+                    <label class="main-question-label">Sobre la educación para niños y adolescentes (escuelas, liceos, politécnicos), ¿qué necesidades considera más importantes? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="edu_basica_op1" name="educacion_basica_necesidades" value="mejora_calidad_ensenanza"> <label for="edu_basica_op1">Mejora de la calidad de la enseñanza y la formación de los docentes.</label></div>
+                        <div><input type="checkbox" id="edu_basica_op2" name="educacion_basica_necesidades" value="oferta_tecnica_vocacional"> <label for="edu_basica_op2">Oferta de educación técnica y vocacional que responda a las necesidades laborales.</label></div>
+                        <div><input type="checkbox" id="edu_basica_op3" name="educacion_basica_necesidades" value="programas_apoyo_estudiantes"> <label for="edu_basica_op3">Programas de apoyo para estudiantes con dificultades de aprendizaje o necesidades especiales.</label></div>
+                        <div><input type="checkbox" id="edu_basica_op4" name="educacion_basica_necesidades" value="integracion_tecnologia"> <label for="edu_basica_op4">Una mayor y mejor integración de tecnología en las aulas (tablets, internet, pantallas).</label></div>
+                        <div><input type="checkbox" id="edu_basica_op5" name="educacion_basica_necesidades" value="actividades_extraescolares"> <label for="edu_basica_op5">Más actividades extraescolares (deportes, arte, ciencia).</label></div>
+                        <div><input type="checkbox" id="edu_basica_op6" name="educacion_basica_necesidades" value="otros"> <label for="edu_basica_op6">Otra necesidad (especifique):</label><input type="text" id="edu_basica_otros_texto" name="educacion_basica_necesidades_otros" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+
+                <h3>Formación Técnica y de Adultos</h3>
+                <div class="question-block">
+                    <label class="main-question-label">Sobre las oportunidades de formación técnica y para adultos, ¿cuáles son más necesarias? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="edu_tecnica_op1" name="educacion_tecnica_necesidades" value="formacion_tecnologia"> <label for="edu_tecnica_op1">Formación en tecnología (programación, diseño gráfico, reparación de computadoras, etc.).</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op2" name="educacion_tecnica_necesidades" value="talleres_emprendimiento"> <label for="edu_tecnica_op2">Talleres de emprendimiento y desarrollo de pequeños negocios.</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op3" name="educacion_tecnica_necesidades" value="programas_nivelacion_academica"> <label for="edu_tecnica_op3">Programas de nivelación académica para pruebas nacionales o ingreso a la universidad.</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op4" name="educacion_tecnica_necesidades" value="programas_alfabetizacion_adultos"> <label for="edu_tecnica_op4">Programas de alfabetización y educación básica para adultos.</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op5" name="educacion_tecnica_necesidades" value="cursos_tecnicos_corta_duracion"> <label for="edu_tecnica_op5">Cursos técnicos de corta duración (plomería, electricidad, etc.).</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op6" name="educacion_tecnica_necesidades" value="cursos_idiomas"> <label for="edu_tecnica_op6">Cursos de idiomas.</label></div>
+                        <div><input type="checkbox" id="edu_tecnica_op7" name="educacion_tecnica_necesidades" value="otros"> <label for="edu_tecnica_op7">Otra oportunidad de formación (especifique):</label><input type="text" id="edu_tecnica_otros_texto" name="educacion_tecnica_necesidades_otros" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- F. Medio Ambiente -->
+            <div class="survey-page" id="page_medio_ambiente">
+                <h2>F. Medio Ambiente y Sostenibilidad</h2>
+                <div class="question-block">
+                    <label class="main-question-label">¿Qué iniciativas son más necesarias para que CJB sea más sostenible? (Marque hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="ma_p2_op1" name="ambiente_iniciativas" value="programas_reciclaje"> <label for="ma_p2_op1">Creación y mejora de programas de reciclaje.</label></div>
+                        <div><input type="checkbox" id="ma_p2_op2" name="ambiente_iniciativas" value="campanas_educativas_ahorro"> <label for="ma_p2_op2">Campañas educativas sobre ahorro de agua y energía.</label></div>
+                        <div><input type="checkbox" id="ma_p2_op3" name="ambiente_iniciativas" value="aumento_areas_verdes"> <label for="ma_p2_op3">Aumento y mantenimiento de las áreas verdes y parques.</label></div>
+                        <div><input type="checkbox" id="ma_p2_op4" name="ambiente_iniciativas" value="jornadas_siembra_arboles"> <label for="ma_p2_op4">Realización de jornadas de siembra de árboles.</label></div>
+                        <div><input type="checkbox" id="ma_p2_op5" name="ambiente_iniciativas" value="huertos_urbanos"> <label for="ma_p2_op5">Creación y apoyo a más huertos urbanos comunitarios.</label></div>
+                        <div><input type="checkbox" id="ma_p2_op7" name="ambiente_iniciativas" value="transporte_sostenible"> <label for="ma_p2_op7">Fomento del transporte sostenible (ej. más ciclovías seguras, mejor transporte público).</label></div>
+                        <div><input type="checkbox" id="ma_p2_op8" name="ambiente_iniciativas" value="energias_renovables"> <label for="ma_p2_op8">Promoción del uso de energías renovables en viviendas y edificios (ej. paneles solares).</label></div>
+                        <div><input type="checkbox" id="ma_p2_op10" name="ambiente_iniciativas" value="control_sancion_contaminantes"> <label for="ma_p2_op10">Mayor control y sanción a quienes contaminan (ruido, basura).</label></div>
+                        <div><input type="checkbox" id="ma_p2_op11_otros" name="ambiente_iniciativas" value="otros"> <label for="ma_p2_op11_otros">Otra iniciativa (especifique):</label><input type="text" id="ma_p2_iniciativas_otros_texto" name="ambiente_iniciativas_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+             <!-- G. Deportes -->
+            <div class="survey-page" id="page_deportes">
+                <h2>G. Deportes y Recreación</h2>
+                <div class="question-block">
+                    <label class="main-question-label">Además de las canchas que se construyen (baloncesto, fútbol, etc.), ¿qué otras disciplinas deportivas hacen falta? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="dep_inst_op1" name="deportes_instalaciones" value="padel"> <label for="dep_inst_op1">Pádel</label></div>
+                        <div><input type="checkbox" id="dep_inst_op2" name="deportes_instalaciones" value="tennis"> <label for="dep_inst_op2">Tenis</label></div>
+                        <div><input type="checkbox" id="dep_inst_op3" name="deportes_instalaciones" value="boxeo"> <label for="dep_inst_op3">Boxeo</label></div>
+                        <div><input type="checkbox" id="dep_inst_op4" name="deportes_instalaciones" value="taekwondo"> <label for="dep_inst_op4">Taekwondo</label></div>
+                        <div><input type="checkbox" id="dep_inst_op5" name="deportes_instalaciones" value="ajedrez"> <label for="dep_inst_op5">Ajedrez</label></div>
+                        <div><input type="checkbox" id="dep_inst_op6" name="deportes_instalaciones" value="atletismo"> <label for="dep_inst_op6">Atletismo</label></div>
+                        <div><input type="checkbox" id="dep_inst_op7" name="deportes_instalaciones" value="otros"> <label for="dep_inst_op7">Otro tipo de deporte (especifique):</label><input type="text" id="dep_inst_otros_texto" name="deportes_instalaciones_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="question-block">
+                    <label class="main-question-label">Para animar a la gente a participar más, ¿qué actividades deportivas o recreativas hacen más falta? (Marque hasta 2)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="dep_act_op1" name="deportes_actividades" value="torneos_deportivos"> <label for="dep_act_op1">Torneos deportivos comunitarios (baloncesto, fútbol, etc.).</label></div>
+                        <div><input type="checkbox" id="dep_act_op2" name="deportes_actividades" value="clases_grupales_yoga"> <label for="dep_act_op2">Clases grupales al aire libre de yoga.</label></div>
+                        <div><input type="checkbox" id="dep_act_op3" name="deportes_actividades" value="clases_grupales_zumba"> <label for="dep_act_op3">Clases grupales al aire libre de zumba.</label></div>
+                        <div><input type="checkbox" id="dep_act_op4" name="deportes_actividades" value="clases_grupales_baile"> <label for="dep_act_op4">Clases grupales al aire libre de baile.</label></div>
+                        <div><input type="checkbox" id="dep_act_op5" name="deportes_actividades" value="clases_grupales_crossfit"> <label for="dep_act_op5">Clases grupales al aire libre de crossfit.</label></div>
+                        <div><input type="checkbox" id="dep_act_op6" name="deportes_actividades" value="rutas_ciclismo"> <label for="dep_act_op6">Rutas de ciclismo seguras.</label></div>
+                        <div><input type="checkbox" id="dep_act_op7" name="deportes_actividades" value="juegos_mesa_aire_libre"> <label for="dep_act_op7">Actividades al aire libre (ajedrez, dominó).</label></div>
+                        <div><input type="checkbox" id="dep_act_op8" name="deportes_actividades" value="otros"> <label for="dep_act_op8">Otro tipo de actividad (especifique):</label><input type="text" id="dep_p4_actividades_frecuentes_otros_texto" name="deportes_actividades_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- H. Cultura y Arte -->
+            <div class="survey-page" id="page_cultura_arte">
+                <h2>H. Cultura y Arte</h2>
+                <div class="question-block">
+                    <label class="main-question-label">¿Qué tipo de actividades o espacios culturales considera más necesarios o deseados en la comunidad? (Marque hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="ca_p2_op1" name="cultura_actividades" value="conciertos"> <label for="ca_p2_op1">Conciertos (ej. música popular, clásica, folklórica, urbana).</label></div>
+                        <div><input type="checkbox" id="ca_p2_op2" name="cultura_actividades" value="obras_teatro"> <label for="ca_p2_op2">Obras de teatro (ej. drama, comedia, infantil).</label></div>
+                        <div><input type="checkbox" id="ca_p2_op3" name="cultura_actividades" value="festivales_danza"> <label for="ca_p2_op3">Festivales de danza.</label></div>
+                        <div><input type="checkbox" id="ca_p2_op4" name="cultura_actividades" value="exposiciones_arte"> <label for="ca_p2_op4">Exposiciones de arte (ej. pintura, escultura, fotografía).</label></div>
+                        <div><input type="checkbox" id="ca_p2_op5" name="cultura_actividades" value="talleres_artisticos"> <label for="ca_p2_op5">Talleres artísticos (ej. pintura, música, teatro, artesanía).</label></div>
+                        <div><input type="checkbox" id="ca_p2_op6" name="cultura_actividades" value="clubes_lectura"> <label for="ca_p2_op6">Clubes de lectura o escritura creativa.</label></div>
+                        <div><input type="checkbox" id="ca_p2_op7" name="cultura_actividades" value="proyecciones_cine"> <label for="ca_p2_op7">Proyecciones de cine (ej. al aire libre, ciclos temáticos).</label></div>
+                        <div><input type="checkbox" id="ca_p2_op8" name="cultura_actividades" value="ferias_culturales"> <label for="ca_p2_op8">Ferias culturales y de artesanía local.</label></div>
+                        <div><input type="checkbox" id="ca_p2_op9" name="cultura_actividades" value="espacios_ensayo"> <label for="ca_p2_op9">Espacios de ensayo para músicos o grupos de danza.</label></div>
+                        <div><input type="checkbox" id="ca_p2_op10" name="cultura_actividades" value="eventos_poesia"> <label for="ca_p2_op10">Eventos de poesía o literatura.</label></div>
+                        <div><input type="checkbox" id="ca_p2_op11" name="cultura_actividades" value="otros"> <label for="ca_p2_op11">Otro tipo de actividad/espacio (especifique):</label><input type="text" id="ca_p2_actividades_deseadas_otros_texto" name="cultura_actividades_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- I. Participación Ciudadana -->
+            <div class="survey-page" id="page_participacion_ciudadana">
+                <h2>I. Participación Ciudadana</h2>
+                <div class="question-block">
+                    <label class="main-question-label">¿Qué propuestas son más necesarias para mejorar la gestión y la participación en CJB? (Marque hasta 2 opciones)</label>
+                    <div class="checkbox-group" data-max-select="2">
+                        <div><input type="checkbox" id="pc_p2_op2" name="participacion_propuestas" value="implementacion_plataforma_digital"> <label for="pc_p2_op2">Implementar una plataforma digital (web/app) para información y consultas.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op3" name="participacion_propuestas" value="reuniones_informativas_frecuentes"> <label for="pc_p2_op3">Reuniones informativas y de rendición de cuentas más frecuentes.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op4" name="participacion_propuestas" value="publicar_presupuesto_gastos"> <label for="pc_p2_op4">Publicar de forma clara el presupuesto y los gastos.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op5" name="participacion_propuestas" value="mejora_canales_atencion_ciudadana"> <label for="pc_p2_op5">Mejorar los canales de atención para quejas y solicitudes.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op6" name="participacion_propuestas" value="fortalecimiento_juntas_vecinos"> <label for="pc_p2_op6">Fortalecer y dar más apoyo a las Juntas de Vecinos.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op8" name="participacion_propuestas" value="mayor_claridad_responsabilidades"> <label for="pc_p2_op8">Mayor claridad sobre las responsabilidades del Fideicomiso y del Ayuntamiento.</label></div>
+                        <div><input type="checkbox" id="pc_p2_op10_otros" name="participacion_propuestas" value="otros"> <label for="pc_p2_op10_otros">Otra propuesta (especifique):</label><input type="text" id="pc_p2_propuestas_otros_texto" name="participacion_propuestas_otros_texto" class="hidden-by-logic" style="width:auto;flex-grow:1;margin-left:5px" placeholder="Especifique aquí" maxlength="50"></div>
+                    </div>
+                </div>
+                <div class="button-container"><button type="button" class="nav-button prev-page secondary">Anterior</button><button type="button" class="nav-button next-page">Siguiente</button></div>
+            </div>
+
+            <!-- ========= FIN DE SECCIONES DE PREGUNTAS ========= -->
+
+            <div id="thankYouMessage" class="hidden-by-logic" style="margin-top:40px; padding:30px; background-color:#e6ffed; border:1px solid #4cae4c; border-radius:12px; text-align:center;">
+                <h2 style="border-bottom:none;">¡Muchas gracias por tu tiempo y tus respuestas!</h2>
+                <p style="font-size:1.1em;">Tu opinión es muy valiosa para construir una mejor Ciudad Juan Bosch.</p>
+            </div>
+
+            <div id="confirmationModal" class="modal-overlay">
+                <div class="modal-content">
+                    <p>¿Está seguro de que quiere avanzar a las preguntas? Ya no podrá regresar a editar la información personal ni el orden de prioridades.</p>
+                    <button id="confirmAdvance">Sí, avanzar</button>
+                    <button id="cancelAdvance">No, quedarse</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        'use strict';
+
+        // --- Elementos del DOM ---
+        const surveyForm = document.getElementById("ciudadJuanBoschSurvey");
+        const thankYouMessage = document.getElementById("thankYouMessage");
+        const sortableList = document.getElementById('sortable-sections');
+        const prioritizedOrderInput = document.getElementById('prioritized_order');
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmAdvanceBtn = document.getElementById('confirmAdvance');
+        const cancelAdvanceBtn = document.getElementById('cancelAdvance');
+        const allPages = Array.from(document.querySelectorAll(".survey-page"));
+        const validationMessage = document.getElementById('validation-message');
+
+        // --- Objeto de Estado de la Encuesta ---
+        const surveyState = {
+            flow: [],
+            currentIndex: -1,
+            prioritizationLocked: false
+        };
+
+        // --- Lógica de Navegación ---
+        function showCurrentPage() {
+            if (surveyState.currentIndex < 0 || surveyState.currentIndex >= surveyState.flow.length) {
+                console.error("Índice de flujo fuera de rango:", surveyState.currentIndex);
+                return;
+            }
+            const pageIdToShow = surveyState.flow[surveyState.currentIndex];
+            const isFirstSectionPage = surveyState.prioritizationLocked && surveyState.currentIndex === 2;
+
+            allPages.forEach(page => {
+                const isActive = page.id === pageIdToShow;
+                page.style.display = isActive ? "block" : "none";
+                page.classList.toggle("active-page", isActive);
+                if (isActive) {
+                    initializePageLogic(page);
+                    const prevButton = page.querySelector('.nav-button.prev-page');
+                    if (prevButton) {
+                        prevButton.style.display = isFirstSectionPage ? 'none' : 'inline-block';
+                    }
+                }
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function navigateNext() {
+            const currentPage = document.querySelector(".survey-page.active-page");
+            if (!currentPage) return;
+
+            if (!validatePage(currentPage)) {
+                return; 
+            }
+            
+            const currentPageId = currentPage.id;
+            if (currentPageId === 'page_prioritization') {
+                if (confirmationModal) confirmationModal.style.display = 'flex';
+                else lockPrioritizationAndProceed();
+            } else if (surveyState.currentIndex < surveyState.flow.length - 1) {
+                surveyState.currentIndex++;
+                showCurrentPage();
+            }
+        }
+
+        function navigatePrev() {
+            if (surveyState.currentIndex > 0) {
+                surveyState.currentIndex--;
+                showCurrentPage();
+            }
+        }
+        
+        function lockPrioritizationAndProceed() {
+            surveyState.prioritizationLocked = true;
+            if (confirmationModal) confirmationModal.style.display = 'none';
+
+            const orderedSectionIds = Array.from(sortableList.children)
+                .map(item => item.dataset.sectionId)
+                .filter(id => id);
+            prioritizedOrderInput.value = JSON.stringify(orderedSectionIds);
+            
+            const baseFlow = ['page1', 'page_prioritization'];
+            surveyState.flow = [...baseFlow, ...orderedSectionIds];
+            
+            document.getElementById('page1').classList.add('permanently-hidden');
+            document.getElementById('page_prioritization').classList.add('permanently-hidden');
+            
+            const lastSectionId = orderedSectionIds[orderedSectionIds.length - 1];
+            if (lastSectionId) {
+                 const lastPage = document.getElementById(lastSectionId);
+                 if (lastPage) {
+                    const nextBtn = lastPage.querySelector('.nav-button.next-page');
+                    if (nextBtn) {
+                        nextBtn.textContent = 'Enviar Encuesta';
+                        nextBtn.type = 'submit';
+                        nextBtn.classList.remove('next-page');
+                    }
+                }
+            }
+            
+            surveyState.currentIndex++;
+            showCurrentPage();
+        }
+
+        // --- Lógica de Validación ---
+        function validatePage(page) {
+            let isValid = true;
+            let firstInvalidField = null;
+
+            validationMessage.style.display = 'none';
+            page.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+
+            const fields = page.querySelectorAll('input[required], select[required], textarea[required]');
+
+            fields.forEach(field => {
+                const questionBlock = field.closest('.question-block');
+                if (field.offsetParent === null || (questionBlock && questionBlock.style.display === 'none')) {
+                    return;
+                }
+                
+                let fieldValid = true;
+                if (field.type === 'radio') {
+                    if (!page.querySelector(`input[name="${field.name}"]:checked`)) {
+                        fieldValid = false;
+                    }
+                } else if (!field.value.trim()) {
+                    fieldValid = false;
+                }
+
+                if (!fieldValid) {
+                    isValid = false;
+                    const mainLabel = field.closest('.question-block')?.querySelector('.main-question-label');
+                    if (mainLabel) mainLabel.classList.add('error');
+                    if (field.type === 'radio') {
+                        const groupContainer = field.closest('.options-group, .likert-table');
+                        if (groupContainer) groupContainer.classList.add('error');
+                    } else {
+                         field.classList.add('error');
+                    }
+                    if (!firstInvalidField) firstInvalidField = mainLabel || field;
+                }
+            });
+            
+            if (!isValid) {
+                validationMessage.textContent = 'Por favor, complete todos los campos obligatorios resaltados.';
+                validationMessage.style.display = 'block';
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            return isValid;
+        }
+
+        // --- Lógica Específica de la Página ---
+        function initializePageLogic(page) {
+            if (page.id === 'page1') {
+                page.querySelectorAll('input[name="tiene_hijos"]').forEach(radio => radio.addEventListener('change', handleTieneHijosChange));
+                handleTieneHijosChange();
+            }
+
+            page.querySelectorAll('input[type="checkbox"][value="otros"]').forEach(control => {
+                const textField = control.closest('div').querySelector('input[type="text"], textarea');
+                if (textField) {
+                     const update = () => {
+                        const isChecked = control.checked;
+                        textField.style.display = isChecked ? 'block' : 'none';
+                        textField.required = isChecked;
+                        if (!isChecked) {
+                            textField.value = '';
+                            textField.classList.remove('error');
+                        }
+                     };
+                     control.addEventListener('change', update);
+                     update();
+                }
+            });
+            
+            page.querySelectorAll('.checkbox-group[data-max-select]').forEach(group => {
+                const max = parseInt(group.dataset.maxSelect);
+                const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+                const update = () => {
+                     const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+                     checkboxes.forEach(innerCb => {
+                        if (!innerCb.checked) {
+                            innerCb.disabled = checkedCount >= max;
+                        }
+                    });
+                };
+                checkboxes.forEach(cb => cb.addEventListener('change', update));
+                update();
+            });
+        }
+        
+        function handleTieneHijosChange() {
+            const tieneHijosSi = document.getElementById('q3_op1')?.checked;
+            const bloqueQ4 = document.getElementById('bloque_q4');
+            const bloqueQ5 = document.getElementById('bloque_q5');
+            const q4_radios = document.querySelectorAll('input[name="cuantos_hijos"]');
+            
+            const setRequired = (elements, required) => {
+                 elements.forEach(el => el.required = required);
+            };
+
+            if (bloqueQ4) {
+                bloqueQ4.style.display = tieneHijosSi ? 'block' : 'none';
+                setRequired(q4_radios, tieneHijosSi);
+            }
+            if (bloqueQ5) bloqueQ5.style.display = tieneHijosSi ? 'block' : 'none';
+            
+            if (!tieneHijosSi) {
+                [bloqueQ4, bloqueQ5].forEach(b => {
+                    if (b) b.querySelectorAll('input:checked').forEach(input => input.checked = false);
+                });
+            }
+        }
+        
+        // --- Inicialización de Sortable.js ---
+        if (sortableList) {
+            new Sortable(sortableList, { animation: 150, ghostClass: 'sortable-ghost', onEnd: updateSectionOrderNumbers });
+            updateSectionOrderNumbers();
+        }
+
+        function updateSectionOrderNumbers() {
+            sortableList.querySelectorAll('li .order-number').forEach((span, index) => {
+                span.textContent = (index + 1) + '.';
+            });
+        }
+
+        // --- Event Listeners Globales ---
+        surveyForm.addEventListener('click', function(e) {
+            if (e.target.matches('.nav-button.next-page')) {
+                navigateNext();
+            }
+            if (e.target.matches('.nav-button.prev-page')) {
+                navigatePrev();
+            }
+        });
+        
+        if (confirmAdvanceBtn) confirmAdvanceBtn.addEventListener('click', lockPrioritizationAndProceed);
+        if (cancelAdvanceBtn) cancelAdvanceBtn.addEventListener('click', () => { confirmationModal.style.display = 'none'; });
+
+        surveyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const currentPage = document.querySelector(".survey-page.active-page");
+            if (currentPage && !validatePage(currentPage)) {
+                 return;
+            }
+            console.log("--- Encuesta Enviada (Simulación) ---");
+            const formData = new FormData(surveyForm);
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            surveyForm.style.display = 'none';
+            thankYouMessage.style.display = 'block';
+            window.scrollTo(0,0);
+        });
+
+        // --- Arranque Inicial ---
+        function initializeSurvey() {
+            surveyState.flow = ['page1', 'page_prioritization'];
+            surveyState.currentIndex = 0;
+            showCurrentPage();
+        }
+
+        initializeSurvey();
+    });
+    </script>
+</body>
+</html>
